@@ -8,8 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\" />
-    <Folder Include="Areas\ScheduleManage\Controllers\" />
     <Folder Include="Areas\ScheduleManage\Data\" />
     <Folder Include="Areas\ScheduleManage\Models\" />
     <Folder Include="Areas\ScheduleManage\Views\" />
