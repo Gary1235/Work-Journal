@@ -2,6 +2,7 @@
 
 namespace Work_Journal.Areas.ScheduleManage.Controllers
 {
+    [Area("ScheduleManage")]
     public class WorkController : Controller
     {
         public IActionResult Index()
@@ -9,7 +10,19 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
             return View();
         }
 
-        public IActionResult Detail()
+        public IActionResult Add()
+        {
+            return View();
+        }
+
+        public IActionResult Edit()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Update()
         {
             return View();
         }

@@ -10,7 +10,6 @@
   <ItemGroup>
     <Folder Include="Areas\ScheduleManage\Data\" />
     <Folder Include="Areas\ScheduleManage\Models\" />
-    <Folder Include="Areas\ScheduleManage\Views\" />
   </ItemGroup>
 
   <ItemGroup>
