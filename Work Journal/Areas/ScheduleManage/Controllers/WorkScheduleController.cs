@@ -3,7 +3,7 @@
 namespace Work_Journal.Areas.ScheduleManage.Controllers
 {
     [Area("ScheduleManage")]
-    public class WorkController : Controller
+    public class WorkScheduleController : Controller
     {
         public IActionResult Index()
         {

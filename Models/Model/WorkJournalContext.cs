@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Models;
+namespace Models.Model;
 
 public partial class WorkJournalContext : DbContext
 {

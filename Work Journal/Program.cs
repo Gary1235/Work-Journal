@@ -1,4 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Models.Model;
+using Services;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add ConnectionString from appsetting.json
+var connectionString = builder.Configuration.GetConnectionString("DB");
+builder.Services.AddDbContext<WorkJournalContext>(options => options.UseSqlServer(connectionString));
+
+// Register interface
+builder.Services.AddSingleton<IWrokScheduleService, WorkScheduleService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
