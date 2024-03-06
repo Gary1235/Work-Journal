@@ -4,8 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.ViewModel
+namespace Models.ViewModel.ScheduleManage
 {
+    public class WorkScheduleList : PageListViewModel
+    {
+        public WorkScheduleList()
+        {
+            this.List = new List<ScheduleViewModel>();
+        }
+
+        public List<ScheduleViewModel> List { get; set; }
+    }
+
     public class ScheduleViewModel
     {
         public Guid Id { get; set; }

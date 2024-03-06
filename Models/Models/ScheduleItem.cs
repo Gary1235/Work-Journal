@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Models.Model;
+namespace Models.Models;
 
 public partial class ScheduleItem
 {

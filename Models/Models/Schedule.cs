@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Models.Model;
+namespace Models.Models;
 
 public partial class Schedule
 {
@@ -14,4 +14,6 @@ public partial class Schedule
     public DateTime CreateDateTime { get; set; }
 
     public DateTime? UpdateDateTime { get; set; }
+
+    public bool IsDelete { get; set; }
 }

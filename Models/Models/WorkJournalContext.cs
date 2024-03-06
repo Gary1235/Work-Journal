@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Models.Model;
+namespace Models.Models;
 
 public partial class WorkJournalContext : DbContext
 {
@@ -27,7 +27,7 @@ public partial class WorkJournalContext : DbContext
     {
         modelBuilder.Entity<Schedule>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Schedule__3214EC07B3416E9C");
+            entity.HasKey(e => e.Id).HasName("PK__Schedule__3214EC07617E4B22");
 
             entity.ToTable("Schedule");
 
@@ -40,7 +40,7 @@ public partial class WorkJournalContext : DbContext
 
         modelBuilder.Entity<ScheduleItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Schedule__3214EC07C29AFA91");
+            entity.HasKey(e => e.Id).HasName("PK__Schedule__3214EC07290999BE");
 
             entity.ToTable("ScheduleItem");
 

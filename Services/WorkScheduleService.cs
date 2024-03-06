@@ -1,11 +1,13 @@
-﻿using Models.Model;
-using Models.ViewModel;
+﻿using Logic;
+using Models.Models;
+using Models.ViewModel.ScheduleManage;
+using PagedList;
 
 namespace Services
 {
     public interface IWrokScheduleService
     {
-        List<ScheduleViewModel> GetList();
+        WorkScheduleList GetList();
 
         ScheduleItemViewModel GetData(Guid id);
     }
@@ -13,14 +15,15 @@ namespace Services
 
     public class WorkScheduleService : IWrokScheduleService
     {
-        public List<ScheduleViewModel> GetList()
+        public WorkScheduleList GetList()
         {
-            var list = new List<ScheduleViewModel>();
+            var list = new WorkScheduleList();
 
             // todo 實作邏輯
             using (var db = new WorkJournalContext())
             {
-                
+                var query = db.Schedules.Where(x => !x.IsDelete);
+                var test = query.ToPagedList(1, 10);
             }
 
             return list;
@@ -33,6 +36,22 @@ namespace Services
             // todo 實作邏輯
 
             return data;
+        }
+
+        private ScheduleViewModel Mapping(Schedule model)
+        {
+
+            var viewModel = new ScheduleViewModel
+            {
+                Id = model.Id,
+                Subject = model.Subject,
+                CreateDateTime = model.CreateDateTime.ToRocShortDataTime(),
+                UpdateDateTime = model.UpdateDateTime?.ToRocShortDataTime(),
+                WorkDateTime = model.WorkDateTime?.ToRocShortDataTime(),
+            };
+
+            return viewModel;
+
         }
     }
 }

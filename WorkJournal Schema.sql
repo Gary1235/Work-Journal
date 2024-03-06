@@ -1,11 +1,14 @@
 CREATE DATABASE WorkJournal
 GO
+USE WorkJournal
+GO
 CREATE TABLE Schedule (
 	[Id] UNIQUEIDENTIFIER PRIMARY KEY,
 	[Subject] NVARCHAR(20) NULL,
 	[WorkDateTime] DATETIME NULL,
 	[CreateDateTime] DATETIME NOT NULL,
 	[UpdateDateTime] DATETIME NULL,
+	[IsDelete] INT NOT NULL DEFAULT(0),
 );
 GO
 CREATE TABLE ScheduleItem (
