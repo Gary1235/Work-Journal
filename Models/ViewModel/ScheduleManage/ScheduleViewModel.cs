@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.ViewModel.ScheduleManage
 {
-    public class WorkScheduleList : PageListViewModel
+    public class WorkScheduleModel : PageListViewModel
     {
-        public WorkScheduleList()
+        public WorkScheduleModel()
         {
             this.List = new List<ScheduleViewModel>();
         }

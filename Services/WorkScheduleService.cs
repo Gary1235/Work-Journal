@@ -1,5 +1,6 @@
 ﻿using Logic;
 using Models.Models;
+using Models.ViewModel;
 using Models.ViewModel.ScheduleManage;
 using PagedList;
 
@@ -7,26 +8,43 @@ namespace Services
 {
     public interface IWrokScheduleService
     {
-        WorkScheduleList GetList();
+        WorkScheduleModel GetList(SearchModel search);
 
         ScheduleItemViewModel GetData(Guid id);
+
+        SaveChangesResult AddWorkSchedule(ScheduleItemViewModel viewModel);
     }
 
 
     public class WorkScheduleService : IWrokScheduleService
     {
-        public WorkScheduleList GetList()
+        public WorkScheduleModel GetList(SearchModel search)
         {
-            var list = new WorkScheduleList();
+            var model = new WorkScheduleModel();
+            IPagedList<Schedule> pageList;
 
             // todo 實作邏輯
             using (var db = new WorkJournalContext())
             {
                 var query = db.Schedules.Where(x => !x.IsDelete);
-                var test = query.ToPagedList(1, 10);
+
+                if (!string.IsNullOrEmpty(search.Keyword))
+                {
+                    query = query.Where(x => x.Subject.Contains(search.Keyword));
+                }
+
+                pageList = query.ToPagedList(search.CurrentPage, search.PageSize);
             }
 
-            return list;
+            model.List = Mapping(pageList.ToList(), new List<ScheduleViewModel>());
+            model.PageCount = pageList.PageCount;
+            model.PageSize = pageList.PageSize;
+            model.IsFirstPage = pageList.IsFirstPage;
+            model.IsLastPage = pageList.IsLastPage;
+            model.HasNextPage = pageList.HasNextPage;
+            model.HasPreviousPage = pageList.HasPreviousPage;
+
+            return model;
         }
 
         public ScheduleItemViewModel GetData(Guid id)
@@ -36,6 +54,15 @@ namespace Services
             // todo 實作邏輯
 
             return data;
+        }
+
+        public SaveChangesResult AddWorkSchedule(ScheduleItemViewModel viewModel)
+        {
+            var result = new SaveChangesResult(false, "更新失敗");
+
+            // todo 實作邏輯
+
+            return result;
         }
 
         private T2 Mapping<T1, T2>(T1 obj1, T2 obj2)
@@ -58,7 +85,6 @@ namespace Services
             }
 
             return obj2;
-
         }
     }
 }
