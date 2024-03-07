@@ -8,7 +8,7 @@ CREATE TABLE Schedule (
 	[WorkDateTime] DATETIME NULL,
 	[CreateDateTime] DATETIME NOT NULL,
 	[UpdateDateTime] DATETIME NULL,
-	[IsDelete] INT NOT NULL DEFAULT(0),
+	[IsDelete] BIT NOT NULL DEFAULT(0),
 );
 GO
 CREATE TABLE ScheduleItem (
