@@ -38,19 +38,26 @@ namespace Services
             return data;
         }
 
-        private ScheduleViewModel Mapping(Schedule model)
+        private T2 Mapping<T1, T2>(T1 obj1, T2 obj2)
         {
-
-            var viewModel = new ScheduleViewModel
+            if (obj1 is Schedule model && obj2 is ScheduleViewModel viewModle)
             {
-                Id = model.Id,
-                Subject = model.Subject,
-                CreateDateTime = model.CreateDateTime.ToRocShortDataTime(),
-                UpdateDateTime = model.UpdateDateTime?.ToRocShortDataTime(),
-                WorkDateTime = model.WorkDateTime?.ToRocShortDataTime(),
-            };
+                viewModle.Id = model.Id;
+                viewModle.Subject = model.Subject;
+                viewModle.CreateDateTime = model.CreateDateTime.ToRocShortDataTime();
+                viewModle.UpdateDateTime = model.UpdateDateTime?.ToRocShortDataTime();
+                viewModle.WorkDateTime = model.WorkDateTime?.ToRocShortDataTime();
+            }
+            else if (obj1 is ScheduleViewModel viewModel2 && obj2 is Schedule model2)
+            {
+                model2.Id = viewModel2.Id;
+                model2.Subject = viewModel2.Subject;
+                model2.CreateDateTime = DateTime.TryParse(viewModel2.CreateDateTime, out DateTime cd) ? cd : DateTime.Now;
+                model2.UpdateDateTime = DateTime.TryParse(viewModel2.UpdateDateTime, out DateTime ud) ? ud : null;
+                model2.WorkDateTime = DateTime.TryParse(viewModel2.WorkDateTime, out DateTime wd) ? wd : null;
+            }
 
-            return viewModel;
+            return obj2;
 
         }
     }
