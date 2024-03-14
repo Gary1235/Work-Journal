@@ -5,40 +5,54 @@
 
 
 <style>
-    /* CSS樣式可以放在這裡 */
-    /* 為了示範，這裡只是一個簡單的例子 */
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
+    table {
+        width: 100%;
+        border-collapse: collapse;
     }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
+    th, td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
     }
 
-    ul {
-      list-style-type: none;
-      padding: 0;
+    th {
+        background-color: #f2f2f2;
     }
-
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-    }
-  </style>
+</style>
 <div class="container">
     <h1>工作日誌</h1>
     <!-- 搜尋框 -->
     <input type="text" id="searchInput" placeholder="輸入關鍵字搜尋...">
 
     <!-- 列表 -->
-    <ul id="list">
-        <li>項目1</li>
-        <li>項目2</li>
-        <li>項目3</li>
-        <!-- 可以在這裡動態加載列表項目 -->
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>工作日期</th>
+                <th>標題</th>
+                <th>動作</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
 </div>
+
+@section Scripts {
+    <script>
+        var app = Vue.createApp({
+            data() {
+                return {
+                    list: [],
+                }
+            },
+            methods: {
+                Init() {
+
+                }
+            },
+        });
+    </script>
+}

@@ -6,14 +6,27 @@ using System.Threading.Tasks;
 
 namespace Models.ViewModel.ScheduleManage
 {
-    public class WorkScheduleModel : PageListViewModel
+    public class WorkSchedulePageList : PageListViewModel
     {
-        public WorkScheduleModel()
+        public WorkSchedulePageList()
         {
             this.List = new List<ScheduleViewModel>();
         }
 
         public List<ScheduleViewModel> List { get; set; }
+    }
+
+    public class WorkScheduleViewModel
+    {
+        public WorkScheduleViewModel()
+        {
+            this.Schedule = new ScheduleViewModel();
+            this.ScheduleItem = new List<ScheduleItemViewModel>();
+        }
+
+        public ScheduleViewModel Schedule { get; set; }
+
+        public List<ScheduleItemViewModel> ScheduleItem { get; set; }
     }
 
     public class ScheduleViewModel
