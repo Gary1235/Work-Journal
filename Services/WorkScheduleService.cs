@@ -7,7 +7,7 @@ using PagedList;
 
 namespace Services
 {
-    public interface IWrokScheduleService
+    public interface IWorkScheduleService
     {
         /// <summary>
         /// 取得 列表
@@ -36,7 +36,7 @@ namespace Services
     }
 
 
-    public class WorkScheduleService : BaseService, IWrokScheduleService
+    public class WorkScheduleService : BaseService, IWorkScheduleService
     {
         public WorkScheduleService(WorkJournalContext dbContext) : base(dbContext)
         {

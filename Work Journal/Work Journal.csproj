@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="jQuery.BlockUI" Version="2.70.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.2" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.4.2">
       <PrivateAssets>all</PrivateAssets>

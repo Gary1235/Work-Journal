@@ -9,7 +9,7 @@ var connectionString = builder.Configuration.GetConnectionString("DB");
 builder.Services.AddDbContext<WorkJournalContext>(options => options.UseSqlServer(connectionString));
 
 // Register interface
-builder.Services.AddSingleton<IWrokScheduleService, WorkScheduleService>();
+builder.Services.AddSingleton<IWorkScheduleService, WorkScheduleService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

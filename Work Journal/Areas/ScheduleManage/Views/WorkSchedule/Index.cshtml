@@ -1,8 +1,5 @@
-﻿
-@{
-
-}
-
+﻿@using Newtonsoft.Json
+@using Work_Journal.Areas.ScheduleManage.Controllers;
 
 <style>
     table {
@@ -40,17 +37,39 @@
     </table>
 </div>
 
+@Html.AntiForgeryToken();
+
 @section Scripts {
     <script>
         var app = Vue.createApp({
             data() {
                 return {
-                    list: [],
+                    pageList: {},
+                    Keyword: '',
                 }
+            },
+            created: function () {
+                this.Init();
             },
             methods: {
                 Init() {
+                    ShowBlock();
+                    var model = {
+                        Currentpage = this.pageList.Currentpage,
+                        PageSize = this.pageList.PageSize,
+                        Keyword = this.Keyword,
+                        __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val(),
+                    };
 
+                    $.ajax({
+                        url: '@Url.Action(nameof(WorkScheduleController.SwitchPage))',
+                        type: 'POST',
+                        data: model,
+                        success: function (response) {
+                            app.pageList = response;
+                            CloseBlock();
+                        }
+                    })
                 }
             },
         });
