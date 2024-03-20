@@ -21,7 +21,8 @@
     <h1>工作日誌</h1>
     <!-- 搜尋框 -->
     <input type="text" id="searchInput" placeholder="輸入關鍵字搜尋...">
-
+    <!--新增鈕-->
+    <button type="button" v-on:click="Add()">新增</button>
     <!-- 列表 -->
     <table>
         <thead>
@@ -32,7 +33,11 @@
             </tr>
         </thead>
         <tbody>
-
+            <tr>
+                <td>{{WorkDateTimeString}}</td>
+                <td>{{Subject}}</td>
+                <td><button type="button" v-on:click="Edit()">編輯</button></td>
+            </tr>
         </tbody>
     </table>
 </div>
@@ -69,8 +74,14 @@
                             app.pageList = response;
                             CloseBlock();
                         }
-                    })
-                }
+                    });
+                },
+                Edit() {
+
+                },
+                Add() {
+
+                },
             },
         });
     </script>

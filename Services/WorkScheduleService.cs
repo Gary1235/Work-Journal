@@ -20,7 +20,7 @@ namespace Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        ScheduleItemViewModel GetData(Guid id);
+        ScheduleItemViewModel GetWorkScheduleItem(Guid id);
         /// <summary>
         /// 新增 工作行程
         /// </summary>
@@ -79,7 +79,7 @@ namespace Services
                 Id = newScheduleId,
                 Subject = viewModel.Schedule.Subject,
                 CreateDateTime = dateTimeNow,
-                WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTime, out DateTime outputTime) ? outputTime : null,
+                WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTimeString, out DateTime outputTime) ? outputTime : null,
                 IsDelete = false,
             };
             db.Schedules.Add(model);
@@ -111,7 +111,7 @@ namespace Services
             {
                 schedule.Subject = viewModel.Schedule.Subject;
                 schedule.UpdateDateTime = dateTimeNow;
-                schedule.WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTime, out DateTime outputDate) ? outputDate : null;
+                schedule.WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTimeString, out DateTime outputDate) ? outputDate : null;
             }
 
             // Delete old ScheduleItem
@@ -135,7 +135,7 @@ namespace Services
             return result;
         }
 
-        public ScheduleItemViewModel GetData(Guid id)
+        public ScheduleItemViewModel GetWorkScheduleItem(Guid id)
         {
             var data = new ScheduleItemViewModel();
 
@@ -171,19 +171,19 @@ namespace Services
             {
                 viewModle.Id = model.Id;
                 viewModle.Subject = model.Subject;
-                viewModle.CreateDateTime = model.CreateDateTime.ToRocShortDataTime();
-                viewModle.UpdateDateTime = model.UpdateDateTime?.ToRocShortDataTime();
-                viewModle.WorkDateTime = model.WorkDateTime?.ToRocShortDataTime();
+                viewModle.CreateDateTimeString = model.CreateDateTime.ToRocShortDataTime();
+                viewModle.UpdateDateTimeString = model.UpdateDateTime?.ToRocShortDataTime();
+                viewModle.WorkDateTimeString = model.WorkDateTime?.ToRocShortDataTime();
             }
             else if (obj1 is ScheduleViewModel viewModel2 && obj2 is Schedule model2)
             {
                 model2.Id = viewModel2.Id;
                 model2.Subject = viewModel2.Subject;
-                model2.CreateDateTime = DateTime.TryParse(viewModel2.CreateDateTime, out DateTime cd) ? cd : DateTime.Now;
-                model2.UpdateDateTime = DateTime.TryParse(viewModel2.UpdateDateTime, out DateTime ud) ? ud : null;
-                model2.WorkDateTime = DateTime.TryParse(viewModel2.WorkDateTime, out DateTime wd) ? wd : null;
+                model2.CreateDateTime = DateTime.TryParse(viewModel2.CreateDateTimeString, out DateTime cd) ? cd : DateTime.Now;
+                model2.UpdateDateTime = DateTime.TryParse(viewModel2.UpdateDateTimeString, out DateTime ud) ? ud : null;
+                model2.WorkDateTime = DateTime.TryParse(viewModel2.WorkDateTimeString, out DateTime wd) ? wd : null;
             }
-
+            
             return obj2;
         }
     }

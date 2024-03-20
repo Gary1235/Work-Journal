@@ -1,7 +1,7 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Models.ViewModel.ScheduleManage;
+@model WorkScheduleInputPage
 @{
+
 }
 
 
@@ -16,14 +16,21 @@
 </style>
 <div id="app">
     <div id="container">
-        <h3>工作日期</h3>
+        <h3>工作日誌</h3>
         <!-- 初始輸入欄位 -->
-        <button>新增</button>
-        <template v-for="item in workList">
-            <div class="input-row">
-                <input type="text" v-model="item" placeholder="請輸入工作內容">
-            </div>
-        </template>
+        <div>
+            <p>工作日期</p>
+            <input type="text" placeholder="請輸入工作日期" />
+        </div>
+        <div>
+            <button>新增</button>
+            <template v-for="item in workList">
+                <div class="input-row">
+                    <input type="text" v-model="item" placeholder="請輸入工作內容">
+                    <input type="text" v-model="item" placeholder="請輸入工時"><span>小時</span>
+                </div>
+            </template>
+        </div>
     </div>
     <div>
         <button>確定</button>
@@ -39,9 +46,12 @@
             }
         },
         created () {
-
+            this.Init();
         },
         methods: {
+            Init() {
+
+            },
             AddRow() {
                 this.workList.push('');
             },

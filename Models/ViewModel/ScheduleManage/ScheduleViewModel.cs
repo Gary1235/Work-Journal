@@ -29,17 +29,22 @@ namespace Models.ViewModel.ScheduleManage
         public List<ScheduleItemViewModel> ScheduleItem { get; set; }
     }
 
+    public class WorkScheduleInputPage
+    {
+        public Guid? ScheduleId { get; set; }
+    }
+
     public class ScheduleViewModel
     {
         public Guid Id { get; set; }
 
         public string? Subject { get; set; }
 
-        public string? WorkDateTime { get; set; }
+        public string? WorkDateTimeString { get; set; }
 
-        public string? CreateDateTime { get; set; }
+        public string? CreateDateTimeString { get; set; }
 
-        public string? UpdateDateTime { get; set; }
+        public string? UpdateDateTimeString { get; set; }
     }
 
     public class ScheduleItemViewModel

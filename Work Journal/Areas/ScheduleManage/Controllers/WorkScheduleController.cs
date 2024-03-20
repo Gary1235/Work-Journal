@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.ViewModel;
+using Models.ViewModel.ScheduleManage;
 using Services;
 
 namespace Work_Journal.Areas.ScheduleManage.Controllers
@@ -14,6 +15,7 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
             _workScheduleService = workScheduleService;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             
@@ -28,21 +30,36 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
             return Json(list);
         }
 
-        public IActionResult Add()
+        [HttpGet]
+        public IActionResult Input(Guid? scheduleId)
         {
-            return View();
-        }
-
-        public IActionResult Edit()
-        {
-            return View();
+            var model = new WorkScheduleInputPage() { ScheduleId = scheduleId };
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update()
+        public IActionResult GetWorkScheduleItem(Guid scheduleId)
         {
-            return View();
+            var model = _workScheduleService.GetWorkScheduleItem(scheduleId);
+
+            return Json(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Insert(WorkScheduleViewModel model)
+        {
+            var result = _workScheduleService.AddWorkSchedule(model);
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Update(WorkScheduleViewModel model)
+        {
+            var result = _workScheduleService.UpdateWorkSchedule(model);
+            return Json(result);
         }
     }
 }
