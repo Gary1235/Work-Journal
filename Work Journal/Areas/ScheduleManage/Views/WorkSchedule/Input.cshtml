@@ -1,4 +1,5 @@
 ﻿@using Models.ViewModel.ScheduleManage;
+@using Work_Journal.Areas.ScheduleManage.Controllers;
 @model WorkScheduleInputPage
 @{
 
@@ -10,9 +11,10 @@
         display: flex;
         margin-bottom: 10px;
     }
-    .input-row input {
-        margin-right: 10px;
-    }
+
+        .input-row input {
+            margin-right: 10px;
+        }
 </style>
 <div id="app">
     <div id="container">
@@ -20,41 +22,85 @@
         <!-- 初始輸入欄位 -->
         <div>
             <p>工作日期</p>
-            <input type="text" placeholder="請輸入工作日期" />
+
+            <input v-model="schedule.subject" type="text" placeholder="請輸入標題" />
+            <input v-model="schedule.workDateTimeString" type="text" placeholder="請輸入工作日期" />
         </div>
         <div>
-            <button>新增</button>
-            <template v-for="item in workList">
+            <button v-on:click="AddRow()">新增</button>
+            <template v-for="item in scheduleItems">
                 <div class="input-row">
-                    <input type="text" v-model="item" placeholder="請輸入工作內容">
-                    <input type="text" v-model="item" placeholder="請輸入工時"><span>小時</span>
+                    <input type="text" v-model="item.WorkItem" placeholder="請輸入工作內容">
+                    <input type="text" v-model="item.WorkDuration" placeholder="請輸入工時"><span>小時</span>
                 </div>
             </template>
         </div>
     </div>
     <div>
-        <button>確定</button>
+        <button v-on:click="Confirm()">確定</button>
     </div>
 </div>
 
-<script>
+@Html.AntiForgeryToken()
 
-    var app = Vue.createApp({
-        data() {
-            return {
-                workList: [],
-            }
-        },
-        created () {
-            this.Init();
-        },
-        methods: {
-            Init() {
+@section Scripts {
+    <script>
+        class scheduleItem {
+            Id = '';
+            ScheduleId = '';
+            WorkItem = '';
+            WorkDuration = 0;
+        }
 
+        var app = Vue.createApp({
+            data() {
+                return {
+                    schedule: {},
+                    scheduleItems: [],
+                }
             },
-            AddRow() {
-                this.workList.push('');
+            created() {
+                this.Init();
             },
-        },
-    }).mount('#app');
-</script>
+            methods: {
+                Init() {
+                    var scheduleId = '@Model';
+                    if (scheduleId != '') {
+                        $.ajax({
+                            url: '/ScheduleManage/WorkSchedule/GetWorkScheduleItems',
+                            type: 'POST',
+                            data: { id: scheduleId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                            success: function (response) {
+                                app.schedule = response.schedule;
+                                app.scheduleItems = response.scheduleItems;
+                            },
+                        });
+                    }
+                },
+                AddRow() {
+                    var model = {};
+                    this.scheduleItems.push(model);
+                },
+                Confirm() {
+                    ShowBlock();
+                    var model = {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                        Schedule: this.schedule,
+                        ScheduleItems: this.scheduleItems,
+                    };
+
+                    $.ajax({
+                        url: '/ScheduleManage/WorkSchedule/Insert',
+                        type: 'POST',
+                        data: model,
+                        success: function (response) {
+                            CloseBlock();
+                            alert(response.message);
+                            location.href = '/ScheduleManage/WorkSchedule/Index';
+                        },
+                    });
+                },
+            },
+        }).mount('#app');
+    </script>
+}

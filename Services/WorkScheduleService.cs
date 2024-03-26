@@ -20,7 +20,7 @@ namespace Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        ScheduleItemViewModel GetWorkScheduleItem(Guid id);
+        WorkScheduleViewModel GetWorkScheduleItems(Guid id);
         /// <summary>
         /// 新增 工作行程
         /// </summary>
@@ -77,15 +77,15 @@ namespace Services
             var model = new Schedule
             {
                 Id = newScheduleId,
-                Subject = viewModel.Schedule.Subject,
+                Subject = viewModel.Schedule?.Subject,
                 CreateDateTime = dateTimeNow,
-                WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTimeString, out DateTime outputTime) ? outputTime : null,
+                WorkDateTime = DateTime.TryParse(viewModel.Schedule?.WorkDateTimeString, out DateTime outputTime) ? outputTime : null,
                 IsDelete = false,
             };
             db.Schedules.Add(model);
 
             // 建立ScheduleItem
-            foreach (var item in viewModel.ScheduleItem)
+            foreach (var item in viewModel.ScheduleItems)
             {
                 var detail = new ScheduleItem
                 {
@@ -109,9 +109,9 @@ namespace Services
             var schedule = db.Schedules.Where(x => x.Id == viewModel.Schedule.Id).FirstOrDefault();
             if (schedule != null)
             {
-                schedule.Subject = viewModel.Schedule.Subject;
+                schedule.Subject = viewModel.Schedule?.Subject;
                 schedule.UpdateDateTime = dateTimeNow;
-                schedule.WorkDateTime = DateTime.TryParse(viewModel.Schedule.WorkDateTimeString, out DateTime outputDate) ? outputDate : null;
+                schedule.WorkDateTime = DateTime.TryParse(viewModel.Schedule?.WorkDateTimeString, out DateTime outputDate) ? outputDate : null;
             }
 
             // Delete old ScheduleItem
@@ -119,7 +119,7 @@ namespace Services
             db.ScheduleItems.RemoveRange(oldScheduleItems);
 
             // Insert new ScheduleItem
-            foreach (var item in viewModel.ScheduleItem)
+            foreach (var item in viewModel.ScheduleItems)
             {
                 var detail = new ScheduleItem
                 {
@@ -135,11 +135,34 @@ namespace Services
             return result;
         }
 
-        public ScheduleItemViewModel GetWorkScheduleItem(Guid id)
+        public WorkScheduleViewModel GetWorkScheduleItems(Guid id)
         {
-            var data = new ScheduleItemViewModel();
+            var data = new WorkScheduleViewModel();
+            var schedules = db.Schedules
+                .Where(x => x.Id == id && !x.IsDelete)
+                .Select(x => new ScheduleViewModel
+                {
+                    Id = x.Id,
+                    Subject = x.Subject,
+                    WorkDateTime = x.WorkDateTime,
+                    CreateDateTime = x.CreateDateTime,
+                    UpdateDateTime = x.UpdateDateTime,
+                })
+                .FirstOrDefault();
 
-            // todo 實作邏輯
+            var scheduleItems = db.ScheduleItems
+                .Where(x => x.ScheduleId == id)
+                .Select(x => new ScheduleItemViewModel
+                {
+                    Id = x.Id,
+                    ScheduleId = x.ScheduleId,
+                    WorkDuration = x.WorkDuration,
+                    WorkItem = x.WorkItem,
+                })
+                .ToList();
+
+            data.Schedule = schedules ?? new ScheduleViewModel();
+            data.ScheduleItems = scheduleItems;
 
             return data;
         }

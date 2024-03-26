@@ -21,12 +21,12 @@ namespace Models.ViewModel.ScheduleManage
         public WorkScheduleViewModel()
         {
             this.Schedule = new ScheduleViewModel();
-            this.ScheduleItem = new List<ScheduleItemViewModel>();
+            this.ScheduleItems = new List<ScheduleItemViewModel>();
         }
 
-        public ScheduleViewModel Schedule { get; set; }
+        public ScheduleViewModel? Schedule { get; set; }
 
-        public List<ScheduleItemViewModel> ScheduleItem { get; set; }
+        public List<ScheduleItemViewModel> ScheduleItems { get; set; }
     }
 
     public class WorkScheduleInputPage
@@ -41,10 +41,13 @@ namespace Models.ViewModel.ScheduleManage
         public string? Subject { get; set; }
 
         public string? WorkDateTimeString { get; set; }
+        public DateTime? WorkDateTime { get; set; }
 
         public string? CreateDateTimeString { get; set; }
+        public DateTime CreateDateTime { get; set; }
 
         public string? UpdateDateTimeString { get; set; }
+        public DateTime? UpdateDateTime { get; set; }
     }
 
     public class ScheduleItemViewModel

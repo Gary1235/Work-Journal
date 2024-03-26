@@ -44,15 +44,16 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/vue.global.js"></script>
+    <script src="~/js/jquery.blockui.js"></script>
     <script>
         function ShowBlock() {
-            $.BlockUI({
+            $.blockUI({
                 msg: '處理中...'
             })
         }
 
         function CloseBlock() {
-            $.unBlockUI();
+            $.unblockUI();
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

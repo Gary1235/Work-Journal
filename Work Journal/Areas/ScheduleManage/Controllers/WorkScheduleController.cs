@@ -39,11 +39,11 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult GetWorkScheduleItem(Guid scheduleId)
+        public IActionResult GetWorkScheduleItems(Guid scheduleId)
         {
-            var model = _workScheduleService.GetWorkScheduleItem(scheduleId);
+            var list = _workScheduleService.GetWorkScheduleItems(scheduleId);
 
-            return Json(model);
+            return Json(list);
         }
 
         [HttpPost]

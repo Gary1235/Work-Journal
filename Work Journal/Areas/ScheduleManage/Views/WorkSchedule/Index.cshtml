@@ -17,7 +17,7 @@
         background-color: #f2f2f2;
     }
 </style>
-<div class="container">
+<div id="app" class="container">
     <h1>工作日誌</h1>
     <!-- 搜尋框 -->
     <input type="text" id="searchInput" placeholder="輸入關鍵字搜尋...">
@@ -33,16 +33,18 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>{{WorkDateTimeString}}</td>
-                <td>{{Subject}}</td>
-                <td><button type="button" v-on:click="Edit()">編輯</button></td>
-            </tr>
+            <template v-for="item in pageList">
+                <tr>
+                    <td>{{item.workDateTimeString}}</td>
+                    <td>{{item.subject}}</td>
+                    <td><button type="button" v-on:click="Edit()">編輯</button></td>
+                </tr>
+            </template>
         </tbody>
     </table>
 </div>
 
-@Html.AntiForgeryToken();
+@Html.AntiForgeryToken()
 
 @section Scripts {
     <script>
@@ -60,18 +62,18 @@
                 Init() {
                     ShowBlock();
                     var model = {
-                        Currentpage = this.pageList.Currentpage,
-                        PageSize = this.pageList.PageSize,
-                        Keyword = this.Keyword,
-                        __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val(),
+                        Currentpage: 1,
+                        PageSize: 10,
+                        Keyword: '',
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                     };
 
                     $.ajax({
-                        url: '@Url.Action(nameof(WorkScheduleController.SwitchPage))',
+                        url: '/ScheduleManage/WorkSchedule/SwitchPage',
                         type: 'POST',
                         data: model,
                         success: function (response) {
-                            app.pageList = response;
+                            app.pageList = response.list;
                             CloseBlock();
                         }
                     });
@@ -80,9 +82,9 @@
 
                 },
                 Add() {
-
+                    location.href = '/ScheduleManage/WorkSchedule/Input';
                 },
             },
-        });
+        }).mount('#app');
     </script>
 }
