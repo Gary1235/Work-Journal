@@ -79,7 +79,7 @@ namespace Services
                 Id = newScheduleId,
                 Subject = viewModel.Schedule?.Subject,
                 CreateDateTime = dateTimeNow,
-                WorkDateTime = DateTime.TryParse(viewModel.Schedule?.WorkDateTimeString, out DateTime outputTime) ? outputTime : null,
+                WorkDateTime = viewModel.Schedule?.WorkDateTimeString.RocShortToDateTime(),
                 IsDelete = false,
             };
             db.Schedules.Add(model);
@@ -111,7 +111,7 @@ namespace Services
             {
                 schedule.Subject = viewModel.Schedule?.Subject;
                 schedule.UpdateDateTime = dateTimeNow;
-                schedule.WorkDateTime = DateTime.TryParse(viewModel.Schedule?.WorkDateTimeString, out DateTime outputDate) ? outputDate : null;
+                schedule.WorkDateTime = viewModel.Schedule.WorkDateTimeString.RocShortToDateTime();
             }
 
             // Delete old ScheduleItem
@@ -125,7 +125,7 @@ namespace Services
                 {
                     Id = Guid.NewGuid(),
                     WorkDuration = item.WorkDuration,
-                    ScheduleId = item.Id,
+                    ScheduleId = viewModel.Schedule.Id,
                     WorkItem = item.WorkItem,
                 };
                 db.ScheduleItems.Add(detail);
@@ -138,7 +138,7 @@ namespace Services
         public WorkScheduleViewModel GetWorkScheduleItems(Guid id)
         {
             var data = new WorkScheduleViewModel();
-            var schedules = db.Schedules
+            var schedule = db.Schedules
                 .Where(x => x.Id == id && !x.IsDelete)
                 .Select(x => new ScheduleViewModel
                 {
@@ -149,6 +149,12 @@ namespace Services
                     UpdateDateTime = x.UpdateDateTime,
                 })
                 .FirstOrDefault();
+            if (schedule != null)
+            {
+                schedule.WorkDateTimeString = schedule.WorkDateTime.ToRocShortDataTime();
+                schedule.CreateDateTimeString = schedule.CreateDateTime.ToRocShortDataTime();
+                schedule.UpdateDateTimeString = schedule.UpdateDateTime.ToRocShortDataTime();
+            }
 
             var scheduleItems = db.ScheduleItems
                 .Where(x => x.ScheduleId == id)
@@ -161,7 +167,7 @@ namespace Services
                 })
                 .ToList();
 
-            data.Schedule = schedules ?? new ScheduleViewModel();
+            data.Schedule = schedule ?? new ScheduleViewModel();
             data.ScheduleItems = scheduleItems;
 
             return data;
@@ -195,19 +201,20 @@ namespace Services
                 viewModle.Id = model.Id;
                 viewModle.Subject = model.Subject;
                 viewModle.CreateDateTimeString = model.CreateDateTime.ToRocShortDataTime();
-                viewModle.UpdateDateTimeString = model.UpdateDateTime?.ToRocShortDataTime();
-                viewModle.WorkDateTimeString = model.WorkDateTime?.ToRocShortDataTime();
+                viewModle.UpdateDateTimeString = model.UpdateDateTime.ToRocShortDataTime();
+                viewModle.WorkDateTimeString = model.WorkDateTime.ToRocShortDataTime();
             }
             else if (obj1 is ScheduleViewModel viewModel2 && obj2 is Schedule model2)
             {
                 model2.Id = viewModel2.Id;
                 model2.Subject = viewModel2.Subject;
-                model2.CreateDateTime = DateTime.TryParse(viewModel2.CreateDateTimeString, out DateTime cd) ? cd : DateTime.Now;
-                model2.UpdateDateTime = DateTime.TryParse(viewModel2.UpdateDateTimeString, out DateTime ud) ? ud : null;
-                model2.WorkDateTime = DateTime.TryParse(viewModel2.WorkDateTimeString, out DateTime wd) ? wd : null;
+                model2.CreateDateTime = viewModel2.CreateDateTimeString.RocShortToDateTime();
+                model2.UpdateDateTime = viewModel2.UpdateDateTimeString.RocShortToDateTime();
+                model2.WorkDateTime = viewModel2.WorkDateTimeString.RocShortToDateTime();
             }
             
             return obj2;
         }
+
     }
 }

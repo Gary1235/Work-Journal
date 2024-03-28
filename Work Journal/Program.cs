@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Models.Models;
+using Newtonsoft.Json.Serialization;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,12 @@ builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Set default JSON library to NewtonsoftJson
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+});
 
 var app = builder.Build();
 
@@ -32,10 +39,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

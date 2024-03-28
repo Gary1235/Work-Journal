@@ -21,23 +21,29 @@
         <h3>工作日誌</h3>
         <!-- 初始輸入欄位 -->
         <div>
-            <p>工作日期</p>
-
-            <input v-model="schedule.subject" type="text" placeholder="請輸入標題" />
-            <input v-model="schedule.workDateTimeString" type="text" placeholder="請輸入工作日期" />
+            <div class="mb-3">
+                <span>主　　旨：</span>
+                <input v-model="schedule.Subject" type="text" placeholder="請輸入主旨" />
+            </div>
+            <div class="">
+                <span>工作日期：</span>
+                <input v-model="schedule.WorkDateTimeString" type="text" placeholder="請輸入工作日期" />
+            </div>
         </div>
         <div>
-            <button v-on:click="AddRow()">新增</button>
+            <button type="button" v-on:click="AddRow()" class="btn btn-primary my-3">新增</button>
             <template v-for="item in scheduleItems">
-                <div class="input-row">
+                <div class="input-row align-items-center">
                     <input type="text" v-model="item.WorkItem" placeholder="請輸入工作內容">
                     <input type="text" v-model="item.WorkDuration" placeholder="請輸入工時"><span>小時</span>
+                    <i v-on:click="DeleteRow(item)" class="fa-regular fa-trash-can ms-2"></i>
                 </div>
             </template>
         </div>
     </div>
     <div>
-        <button v-on:click="Confirm()">確定</button>
+        <button type="button" v-on:click="Confirm()" class="btn btn-outline-success me-3">確定</button>
+        <button type="button" v-on:click="GoBack()" class="btn btn-secondary">返回</button>
     </div>
 </div>
 
@@ -64,15 +70,15 @@
             },
             methods: {
                 Init() {
-                    var scheduleId = '@Model';
+                    var scheduleId = '@Model.ScheduleId';
                     if (scheduleId != '') {
                         $.ajax({
-                            url: '/ScheduleManage/WorkSchedule/GetWorkScheduleItems',
+                            url: '@Url.Action(nameof(WorkScheduleController.GetWorkScheduleItems))',
                             type: 'POST',
-                            data: { id: scheduleId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                            data: { scheduleId: scheduleId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                             success: function (response) {
-                                app.schedule = response.schedule;
-                                app.scheduleItems = response.scheduleItems;
+                                app.schedule = response.Schedule;
+                                app.scheduleItems = response.ScheduleItems;
                             },
                         });
                     }
@@ -80,6 +86,10 @@
                 AddRow() {
                     var model = {};
                     this.scheduleItems.push(model);
+                },
+                DeleteRow(item) {
+                    var idx = this.scheduleItems.indexOf(item);
+                    this.scheduleItems.splice(idx, 1);
                 },
                 Confirm() {
                     ShowBlock();
@@ -89,18 +99,43 @@
                         ScheduleItems: this.scheduleItems,
                     };
 
-                    $.ajax({
-                        url: '/ScheduleManage/WorkSchedule/Insert',
-                        type: 'POST',
-                        data: model,
-                        success: function (response) {
-                            CloseBlock();
-                            alert(response.message);
-                            location.href = '/ScheduleManage/WorkSchedule/Index';
-                        },
-                    });
+                    if ('@Model.ActionType' == 'Insert') {
+                        InsertAjax(model);
+                    }
+                    else {
+                        UpdateAjax(model);
+                    }
+                },
+                GoBack() {
+                    window.history.back();
                 },
             },
         }).mount('#app');
+
+        function InsertAjax(model) {
+            $.ajax({
+                url: '@Url.Action(nameof(WorkScheduleController.Insert))',
+                type: 'POST',
+                data: model,
+                success: function (response) {
+                    CloseBlock();
+                    alert(response.Message);
+                    location.href = '@Url.Action(nameof(WorkScheduleController.Index))';
+                },
+            });
+        }
+
+        function UpdateAjax(model) {
+            $.ajax({
+                url: '@Url.Action(nameof(WorkScheduleController.Update))',
+                type: 'POST',
+                data: model,
+                success: function (response) {
+                    CloseBlock();
+                    alert(response.Message);
+                    location.href = '@Url.Action(nameof(WorkScheduleController.Index))';
+                },
+            });
+        }
     </script>
 }

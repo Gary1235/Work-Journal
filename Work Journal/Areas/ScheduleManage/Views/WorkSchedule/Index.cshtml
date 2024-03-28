@@ -1,6 +1,6 @@
 ﻿@using Newtonsoft.Json
 @using Work_Journal.Areas.ScheduleManage.Controllers;
-
+@using Logic.Enums;
 <style>
     table {
         width: 100%;
@@ -16,13 +16,26 @@
     th {
         background-color: #f2f2f2;
     }
+
+    .search_box {
+        border: solid;
+        border-radius: 5px;
+    }
+
 </style>
 <div id="app" class="container">
     <h1>工作日誌</h1>
-    <!-- 搜尋框 -->
-    <input type="text" id="searchInput" placeholder="輸入關鍵字搜尋...">
-    <!--新增鈕-->
-    <button type="button" v-on:click="Add()">新增</button>
+    <div class="d-flex align-items-center mb-3">
+        <!-- 搜尋框 -->
+        <div class="search_box">
+            <input type="text" id="searchInput" class="border-0" placeholder="輸入關鍵字搜尋...">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <!--新增鈕-->
+        <button type="button" v-on:click="Add()" class="btn btn-primary ms-3">新增</button>
+        <!--匯出每周行程-->
+        <button type="button" v-on:click="" class="btn btn-secondary ms-3">匯出每周行程</button>
+    </div>
     <!-- 列表 -->
     <table>
         <thead>
@@ -35,9 +48,19 @@
         <tbody>
             <template v-for="item in pageList">
                 <tr>
-                    <td>{{item.workDateTimeString}}</td>
-                    <td>{{item.subject}}</td>
-                    <td><button type="button" v-on:click="Edit()">編輯</button></td>
+                    <td>{{item.WorkDateTimeString}}</td>
+                    <td>{{item.Subject}}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id)">編輯</a></li>
+                                <li><a class="dropdown-item" href="javascript:;">匯出今日行程</a></li>
+                            </ul>
+                        </div>
+                    </td>
                 </tr>
             </template>
         </tbody>
@@ -69,20 +92,20 @@
                     };
 
                     $.ajax({
-                        url: '/ScheduleManage/WorkSchedule/SwitchPage',
+                        url: '@Url.Action("SwitchPage", "WorkSchedule", new { area = "ScheduleManage" })',
                         type: 'POST',
                         data: model,
                         success: function (response) {
-                            app.pageList = response.list;
+                            app.pageList = response.List;
                             CloseBlock();
                         }
                     });
                 },
-                Edit() {
-
+                Edit(id) {
+                    location.href = `@Url.Action(nameof(WorkScheduleController.Input))?scheduleId=${id}&ActionType=@ActionType.Edit`;
                 },
                 Add() {
-                    location.href = '/ScheduleManage/WorkSchedule/Input';
+                    location.href = `@Url.Action(nameof(WorkScheduleController.Input))?ActionType=@ActionType.Insert`;
                 },
             },
         }).mount('#app');

@@ -20,13 +20,13 @@ namespace Services
 
         public SaveChangesResult DbSaveChanges()
         {
-            var result = new SaveChangesResult(false, "");
+            var result = new SaveChangesResult(false, "更新失敗");
 
             try
             {
                 db.SaveChanges();
                 result.IsSuccess = true;
-
+                result.Message = "更新成功";
                 return result;
             }
             catch (Exception ex)

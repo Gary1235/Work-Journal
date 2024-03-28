@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logic.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,8 @@ namespace Models.ViewModel.ScheduleManage
     public class WorkScheduleInputPage
     {
         public Guid? ScheduleId { get; set; }
+
+        public ActionType ActionType { get; set; }
     }
 
     public class ScheduleViewModel

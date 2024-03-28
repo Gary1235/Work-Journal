@@ -31,9 +31,8 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
         }
 
         [HttpGet]
-        public IActionResult Input(Guid? scheduleId)
+        public IActionResult Input(WorkScheduleInputPage model)
         {
-            var model = new WorkScheduleInputPage() { ScheduleId = scheduleId };
             return View(model);
         }
 
