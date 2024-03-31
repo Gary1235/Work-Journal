@@ -37,6 +37,16 @@ namespace Models.ViewModel.ScheduleManage
         public ActionType ActionType { get; set; }
     }
 
+    public class ExportWorkSchedule
+    {
+        public ExportWorkSchedule()
+        {
+            WorkScheduleDic = new Dictionary<DateTime, WorkScheduleViewModel>();
+        }
+
+        public Dictionary<DateTime, WorkScheduleViewModel> WorkScheduleDic { get; set; }
+    }
+
     public class ScheduleViewModel
     {
         public Guid Id { get; set; }
@@ -44,7 +54,7 @@ namespace Models.ViewModel.ScheduleManage
         public string? Subject { get; set; }
 
         public string? WorkDateTimeString { get; set; }
-        public DateTime? WorkDateTime { get; set; }
+        public DateTime WorkDateTime { get; set; }
 
         public string? CreateDateTimeString { get; set; }
         public DateTime CreateDateTime { get; set; }

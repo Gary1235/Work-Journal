@@ -1,5 +1,6 @@
 ﻿using Logic;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using Models.Models;
 using Models.ViewModel;
 using Models.ViewModel.ScheduleManage;
@@ -20,7 +21,13 @@ namespace Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        WorkScheduleViewModel GetWorkScheduleItems(Guid id);
+        WorkScheduleViewModel GetWorkSchedule(Guid id);
+        /// <summary>
+        /// 取得 資料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        WorkScheduleViewModel GetWorkSchedule(DateTime workDateTime);
         /// <summary>
         /// 新增 工作行程
         /// </summary>
@@ -33,6 +40,20 @@ namespace Services
         /// <param name="viewModel"></param>
         /// <returns></returns>
         SaveChangesResult UpdateWorkSchedule(WorkScheduleViewModel viewModel);
+        /// <summary>
+        /// 匯出 行程(當日)
+        /// </summary>
+        /// <param name="scheduleId"></param>
+        /// <param name="needYesterday"></param>
+        /// <returns></returns>
+        ExportWorkSchedule ExportScheduleDaily(Guid scheduleId, bool needYesterday = false);
+        /// <summary>
+        /// 匯出 行程(選擇區間)
+        /// </summary>
+        /// <param name="dateTimeStart"></param>
+        /// <param name="dateTimeEnd"></param>
+        /// <returns></returns>
+        ExportWorkSchedule ExportSchedulePeriod(DateTime dateTimeStart, DateTime dateTimeEnd);
     }
 
 
@@ -79,7 +100,7 @@ namespace Services
                 Id = newScheduleId,
                 Subject = viewModel.Schedule?.Subject,
                 CreateDateTime = dateTimeNow,
-                WorkDateTime = viewModel.Schedule?.WorkDateTimeString.RocShortToDateTime(),
+                WorkDateTime = viewModel.Schedule.WorkDateTimeString.RocShortToDateTime(),
                 IsDelete = false,
             };
             db.Schedules.Add(model);
@@ -135,7 +156,7 @@ namespace Services
             return result;
         }
 
-        public WorkScheduleViewModel GetWorkScheduleItems(Guid id)
+        public WorkScheduleViewModel GetWorkSchedule(Guid id)
         {
             var data = new WorkScheduleViewModel();
             var schedule = db.Schedules
@@ -166,6 +187,48 @@ namespace Services
                     WorkItem = x.WorkItem,
                 })
                 .ToList();
+
+            data.Schedule = schedule ?? new ScheduleViewModel();
+            data.ScheduleItems = scheduleItems;
+
+            return data;
+        }
+
+        public WorkScheduleViewModel GetWorkSchedule(DateTime workDateTime)
+        {
+            var data = new WorkScheduleViewModel();
+            var schedule = new ScheduleViewModel();
+            var scheduleItems = new List<ScheduleItemViewModel>();
+
+            schedule = db.Schedules
+                .Where(x => x.WorkDateTime == workDateTime && !x.IsDelete)
+                .Select(x => new ScheduleViewModel
+                {
+                    Id = x.Id,
+                    Subject = x.Subject,
+                    WorkDateTime = x.WorkDateTime,
+                    CreateDateTime = x.CreateDateTime,
+                    UpdateDateTime = x.UpdateDateTime,
+                })
+                .FirstOrDefault();
+
+            if (schedule != null)
+            {
+                schedule.WorkDateTimeString = schedule.WorkDateTime.ToRocShortDataTime();
+                schedule.CreateDateTimeString = schedule.CreateDateTime.ToRocShortDataTime();
+                schedule.UpdateDateTimeString = schedule.UpdateDateTime.ToRocShortDataTime();
+
+                scheduleItems = db.ScheduleItems
+                .Where(x => x.ScheduleId == schedule.Id)
+                .Select(x => new ScheduleItemViewModel
+                {
+                    Id = x.Id,
+                    ScheduleId = x.ScheduleId,
+                    WorkDuration = x.WorkDuration,
+                    WorkItem = x.WorkItem,
+                })
+                .ToList();
+            }
 
             data.Schedule = schedule ?? new ScheduleViewModel();
             data.ScheduleItems = scheduleItems;
@@ -212,9 +275,48 @@ namespace Services
                 model2.UpdateDateTime = viewModel2.UpdateDateTimeString.RocShortToDateTime();
                 model2.WorkDateTime = viewModel2.WorkDateTimeString.RocShortToDateTime();
             }
-            
+
             return obj2;
         }
 
+        public ExportWorkSchedule ExportScheduleDaily(Guid scheduleId, bool needYesterday = false)
+        {
+            var exportData = new ExportWorkSchedule();
+
+            var currentSchedule = db.Schedules.FirstOrDefault(x => x.Id == scheduleId && !x.IsDelete);
+            if (currentSchedule != null)
+            {
+                // 今日行程 + 昨日行程
+                if (needYesterday)
+                {
+                    exportData = ExportSchedulePeriod(currentSchedule.WorkDateTime.AddDays(-1), currentSchedule.WorkDateTime);
+                }
+                // 今日行程
+                else
+                {
+                    exportData = ExportSchedulePeriod(currentSchedule.WorkDateTime, currentSchedule.WorkDateTime);
+                }
+            }
+
+
+            return exportData;
+        }
+
+        public ExportWorkSchedule ExportSchedulePeriod(DateTime dateTimeStart, DateTime dateTimeEnd)
+        {
+            var exportData = new ExportWorkSchedule();
+
+            var currentDateTime = dateTimeStart;
+            while (DateTime.Compare(currentDateTime, dateTimeEnd) <= 0)
+            {
+                var currentSchedule = GetWorkSchedule(currentDateTime);
+                if (currentSchedule != null && currentSchedule.Schedule != null)
+                {
+                    exportData.WorkScheduleDic.Add(currentSchedule.Schedule.WorkDateTime, currentSchedule);
+                }
+            }
+
+            return exportData;
+        }
     }
 }

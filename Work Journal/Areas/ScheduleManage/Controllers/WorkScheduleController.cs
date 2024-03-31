@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Logic;
+using Microsoft.AspNetCore.Mvc;
 using Models.ViewModel;
 using Models.ViewModel.ScheduleManage;
 using Services;
@@ -27,6 +28,7 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
         public IActionResult SwitchPage(SearchModel search)
         {
             var list = _workScheduleService.GetList(search);
+
             return Json(list);
         }
 
@@ -40,7 +42,7 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult GetWorkScheduleItems(Guid scheduleId)
         {
-            var list = _workScheduleService.GetWorkScheduleItems(scheduleId);
+            var list = _workScheduleService.GetWorkSchedule(scheduleId);
 
             return Json(list);
         }
@@ -58,7 +60,28 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
         public IActionResult Update(WorkScheduleViewModel model)
         {
             var result = _workScheduleService.UpdateWorkSchedule(model);
+
             return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExportScheduleDaily(Guid scheduleId, bool needYesterday)
+        {
+            var exportData = _workScheduleService.ExportScheduleDaily(scheduleId, needYesterday);
+
+            return Json(exportData);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExportSchedulePeriod(string dtSString, string dtEString)
+        {
+            var dtStart = dtSString.RocShortToDateTime();
+            var dtEnd = dtEString.RocShortToDateTime();
+            var exportData = _workScheduleService.ExportSchedulePeriod(dtStart, dtEnd);
+
+            return Json(exportData);
         }
     }
 }

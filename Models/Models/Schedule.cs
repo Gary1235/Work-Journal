@@ -9,7 +9,7 @@ public partial class Schedule
 
     public string? Subject { get; set; }
 
-    public DateTime? WorkDateTime { get; set; }
+    public DateTime WorkDateTime { get; set; }
 
     public DateTime CreateDateTime { get; set; }
 
