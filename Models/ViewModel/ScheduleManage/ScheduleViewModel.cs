@@ -41,10 +41,10 @@ namespace Models.ViewModel.ScheduleManage
     {
         public ExportWorkSchedule()
         {
-            WorkScheduleDic = new Dictionary<DateTime, WorkScheduleViewModel>();
+            WorkSchedules = new List<WorkScheduleViewModel>();
         }
 
-        public Dictionary<DateTime, WorkScheduleViewModel> WorkScheduleDic { get; set; }
+        public List<WorkScheduleViewModel> WorkSchedules { get; set; }
     }
 
     public class ScheduleViewModel

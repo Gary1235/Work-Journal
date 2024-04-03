@@ -312,7 +312,7 @@ namespace Services
                 var currentSchedule = GetWorkSchedule(currentDateTime);
                 if (currentSchedule != null && currentSchedule.Schedule != null)
                 {
-                    exportData.WorkScheduleDic.Add(currentSchedule.Schedule.WorkDateTime, currentSchedule);
+                    exportData.WorkSchedules.Add(currentSchedule);
                 }
             }
 

@@ -32,9 +32,9 @@
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
         <!--新增鈕-->
-        <button type="button" v-on:click="Add()" class="btn btn-primary ms-3">新增</button>
+        <button type="button" v-on:click="Add();" class="btn btn-primary ms-3">新增</button>
         <!--匯出每周行程-->
-        <button type="button" v-on:click="" class="btn btn-secondary ms-3">匯出每周行程</button>
+        <button type="button" v-on:click="ExportModal();" class="btn btn-secondary ms-3">匯出每周行程</button>
     </div>
     <!-- 列表 -->
     <table>
@@ -56,8 +56,8 @@
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id)">編輯</a></li>
-                                <li><a class="dropdown-item" href="javascript:;">匯出今日行程</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id);">編輯</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" v-on:click="">匯出今日行程</a></li>
                             </ul>
                         </div>
                     </td>
@@ -65,6 +65,66 @@
             </template>
         </tbody>
     </table>
+</div>
+
+<!--ExportModal-->
+<div class="modal fade" id="export_schedule" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <input type="text" v-model="startDate" placeholder="輸入開始日期" />
+                    <input type="text" v-model="endDate" placeholder="輸入結束日期" />
+                    <!--輸出版型選擇-->
+                    <select v-model="exportTemplate">
+                        <option value="0">請選擇</option>
+                        <option value="1">表格</option>
+                        <option value="2">文字</option>
+                    </select>
+                    <button type="button">輸出</button>
+                </div>
+                <!--版型預覽-->
+                <div>
+                </div>
+                <!--輸出Area-->
+                <div>
+                    <table style="border: solid;">
+                        <thead>
+                            <tr>
+                                <th colspan="3">工作行程</th>
+                            </tr>
+                            <tr>
+                                <th>日期</th>
+                                <th>Issue Id 主旨</th>
+                                <th>實際工時(時)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="sc in model">
+                                <tr>
+                                    <td>{{DateFormat(sc.Schedule.WorkDateTimeString)}}</td>
+                                    <td v-for="item in sc.ScheduleItems">
+                                        <p>{{item.WorkItem}}</p>
+                                    </td>
+                                    <td v-for="item in sc.ScheduleItems">
+                                        <p>{{item.WorkDuration}}</p>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @Html.AntiForgeryToken()
@@ -107,9 +167,43 @@
                 Add() {
                     location.href = `@Url.Action(nameof(WorkScheduleController.Input))?ActionType=@ActionType.Insert`;
                 },
+                ExportModal() {
+                    $('#export_schedule').modal('show');
+                },
             },
         }).mount('#app');
 
-        
+        var exportApp = Vue.createApp({
+            data() {
+                return {
+                    model: [],
+                    startDate: '',
+                    endDate: '',
+                    exportTemplate: 0,
+                }
+            },
+            methods: {
+                Export() {
+                    var data = {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                        dtSString: this.startDate,
+                        dtEString: this.endDate,
+                    }
+
+                    $.ajax({
+                        url: '@Url.Action(nameof(WorkScheduleController.ExportSchedulePeriod))',
+                        type: 'POST',
+                        data: data,
+                        success: function (response) {
+                            exportApp.model = response;
+                        }
+                    });
+                },
+                DateFormat(dateStr) {
+                    var date = new dayjs(dateStr);
+                    return date.format('MM/DD');
+                },
+            }
+        }).mount('#export_schedule');
     </script>
 }
