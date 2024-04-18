@@ -22,19 +22,31 @@
         border-radius: 5px;
     }
 
+    .angle {
+        border: 0px;
+        background-color: transparent;
+    }
+
 </style>
 <div id="app" class="container">
     <h1>工作日誌</h1>
     <div class="d-flex align-items-center mb-3">
         <!-- 搜尋框 -->
         <div class="search_box">
-            <input type="text" id="searchInput" class="border-0" placeholder="輸入關鍵字搜尋...">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" v-model="keyword" class="border-0" placeholder="輸入關鍵字搜尋...">
+            <i class="fa-solid fa-magnifying-glass" v-on:click="Search();"></i>
         </div>
         <!--新增鈕-->
         <button type="button" v-on:click="Add();" class="btn btn-primary ms-3">新增</button>
         <!--匯出每周行程-->
-        <button type="button" v-on:click="ExportModal();" class="btn btn-secondary ms-3">匯出每周行程</button>
+        @* <button type="button" v-on:click="ExportModal();" class="btn btn-secondary ms-3">匯出每周行程</button> *@
+    </div>
+    <div>
+        <span>第{{model.CurrentPage}}頁，共{{model.PageCount}}頁 | </span>
+        <span>
+            <button class="angle previous" v-on:click="SwitchPage(-1);"><i class="fa-solid fa-angle-left"></i></button>
+            <button class="angle next" v-on:click="SwitchPage(1);"><i class="fa-solid fa-angle-right"></i></button>
+        </span>
     </div>
     <!-- 列表 -->
     <table>
@@ -46,7 +58,7 @@
             </tr>
         </thead>
         <tbody>
-            <template v-for="item in pageList">
+            <template v-for="item in model.List">
                 <tr>
                     <td>{{item.WorkDateTimeString}}</td>
                     <td>{{item.Subject}}</td>
@@ -57,7 +69,7 @@
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id);">編輯</a></li>
-                                <li><a class="dropdown-item" href="javascript:;" v-on:click="">匯出今日行程</a></li>
+                                @* <li><a class="dropdown-item" href="javascript:;" v-on:click="">匯出今日行程</a></li> *@
                             </ul>
                         </div>
                     </td>
@@ -134,8 +146,8 @@
         var app = Vue.createApp({
             data() {
                 return {
-                    pageList: {},
-                    Keyword: '',
+                    model: {},
+                    keyword: '',
                 }
             },
             created: function () {
@@ -143,11 +155,29 @@
             },
             methods: {
                 Init() {
+                    this.GetList();
+                },
+                InitArrow() {
+                    if (this.model.HasPreviousPage) {
+                        $('.previous').prop('disabled', false);
+                    }
+                    else {
+                        $('.previous').prop('disabled', true);
+                    }
+
+                    if (this.model.HasNextPage) {
+                        $('.next').prop('disabled', false);
+                    }
+                    else {
+                        $('.next').prop('disabled', true);
+                    }
+                },
+                GetList() {
                     ShowBlock();
                     var model = {
-                        Currentpage: 1,
-                        PageSize: 10,
-                        Keyword: '',
+                        Currentpage: this.model.CurrentPage,
+                        PageSize: this.model.PageSize,
+                        Keyword: this.keyword,
                         __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                     };
 
@@ -156,10 +186,20 @@
                         type: 'POST',
                         data: model,
                         success: function (response) {
-                            app.pageList = response.List;
+                            app.model = response;
+                            app.InitArrow();
                             CloseBlock();
                         }
                     });
+                },
+                SwitchPage(num) {
+                    this.model.CurrentPage += num;
+                    this.GetList();
+                },
+                Search() {
+                    // 搜尋重置頁數
+                    this.model.CurrentPage = 1;
+                    this.GetList();
                 },
                 Edit(id) {
                     location.href = `@Url.Action(nameof(WorkScheduleController.Input))?scheduleId=${id}&ActionType=@ActionType.Edit`;

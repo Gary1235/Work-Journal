@@ -76,9 +76,12 @@ namespace Services
                 query = query.Where(x => x.Subject.Contains(search.Keyword));
             }
 
-            pageList = query.ToPagedList(search.CurrentPage, search.PageSize);
+            pageList = query
+                .OrderByDescending(x => x.WorkDateTime)
+                .ToPagedList(search.CurrentPage, search.PageSize);
 
             model.List = MappingList(pageList.ToList(), new List<ScheduleViewModel>());
+            model.CurrentPage = search.CurrentPage;
             model.PageCount = pageList.PageCount;
             model.PageSize = pageList.PageSize;
             model.IsFirstPage = pageList.IsFirstPage;
@@ -100,7 +103,7 @@ namespace Services
                 Id = newScheduleId,
                 Subject = viewModel.Schedule?.Subject,
                 CreateDateTime = dateTimeNow,
-                WorkDateTime = viewModel.Schedule.WorkDateTimeString.RocShortToDateTime(),
+                WorkDateTime = viewModel.Schedule.WorkDateTimeString.ToDateTime(),
                 IsDelete = false,
             };
             db.Schedules.Add(model);
@@ -132,7 +135,7 @@ namespace Services
             {
                 schedule.Subject = viewModel.Schedule?.Subject;
                 schedule.UpdateDateTime = dateTimeNow;
-                schedule.WorkDateTime = viewModel.Schedule.WorkDateTimeString.RocShortToDateTime();
+                schedule.WorkDateTime = viewModel.Schedule.WorkDateTimeString.ToDateTime();
             }
 
             // Delete old ScheduleItem
@@ -172,12 +175,13 @@ namespace Services
                 .FirstOrDefault();
             if (schedule != null)
             {
-                schedule.WorkDateTimeString = schedule.WorkDateTime.ToRocShortDataTime();
-                schedule.CreateDateTimeString = schedule.CreateDateTime.ToRocShortDataTime();
-                schedule.UpdateDateTimeString = schedule.UpdateDateTime.ToRocShortDataTime();
+                schedule.WorkDateTimeString = schedule.WorkDateTime.ToString("yyyy-MM-dd");
+                schedule.CreateDateTimeString = schedule.CreateDateTime.ToString("yyyy-MM-dd");
+                schedule.UpdateDateTimeString = schedule.UpdateDateTime?.ToString("yyyy-MM-dd");
             }
 
             var scheduleItems = db.ScheduleItems
+                .OrderBy(x => x.WorkItem)
                 .Where(x => x.ScheduleId == id)
                 .Select(x => new ScheduleItemViewModel
                 {
@@ -214,9 +218,9 @@ namespace Services
 
             if (schedule != null)
             {
-                schedule.WorkDateTimeString = schedule.WorkDateTime.ToRocShortDataTime();
-                schedule.CreateDateTimeString = schedule.CreateDateTime.ToRocShortDataTime();
-                schedule.UpdateDateTimeString = schedule.UpdateDateTime.ToRocShortDataTime();
+                schedule.WorkDateTimeString = schedule.WorkDateTime.ToString("yyyy-MM-dd");
+                schedule.CreateDateTimeString = schedule.CreateDateTime.ToString("yyyy-MM-dd");
+                schedule.UpdateDateTimeString = schedule.UpdateDateTime?.ToString("yyyy-MM-dd");
 
                 scheduleItems = db.ScheduleItems
                 .Where(x => x.ScheduleId == schedule.Id)
@@ -263,17 +267,17 @@ namespace Services
             {
                 viewModle.Id = model.Id;
                 viewModle.Subject = model.Subject;
-                viewModle.CreateDateTimeString = model.CreateDateTime.ToRocShortDataTime();
-                viewModle.UpdateDateTimeString = model.UpdateDateTime.ToRocShortDataTime();
-                viewModle.WorkDateTimeString = model.WorkDateTime.ToRocShortDataTime();
+                viewModle.CreateDateTimeString = model.CreateDateTime.ToString("yyyy-MM-dd");
+                viewModle.UpdateDateTimeString = model.UpdateDateTime?.ToString("yyyy-MM-dd");
+                viewModle.WorkDateTimeString = model.WorkDateTime.ToString("yyyy-MM-dd");
             }
             else if (obj1 is ScheduleViewModel viewModel2 && obj2 is Schedule model2)
             {
                 model2.Id = viewModel2.Id;
                 model2.Subject = viewModel2.Subject;
-                model2.CreateDateTime = viewModel2.CreateDateTimeString.RocShortToDateTime();
-                model2.UpdateDateTime = viewModel2.UpdateDateTimeString.RocShortToDateTime();
-                model2.WorkDateTime = viewModel2.WorkDateTimeString.RocShortToDateTime();
+                model2.CreateDateTime = viewModel2.CreateDateTimeString.ToDateTime();
+                model2.UpdateDateTime = viewModel2.UpdateDateTimeString.ToDateTime();
+                model2.WorkDateTime = viewModel2.WorkDateTimeString.ToDateTime();
             }
 
             return obj2;

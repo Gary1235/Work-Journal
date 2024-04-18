@@ -2,43 +2,5 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
 <a href="/ScheduleManage/WorkSchedule/Index"><h1>工作日誌</h1></a>
 
-<div id="app">
-    {{str}}
-    <card></card>
-</div>
-
-@section Scripts {
-    <script src="~/components/componentstest.js"></script>
-    <script>
-        var app = Vue.createApp({
-            data() {
-                return {
-                    str: 'st'
-                }
-            },
-            components: {
-                //自定義名稱 //使用的組件內容
-                'card': {
-                    template: templateTest,
-                    data() {
-                        return {
-                            data: 0,
-                        }
-                    },
-                    methods: {
-                        AddCount() {
-                            this.data += 1;
-                        }
-                    }
-
-                }
-            },
-        }).mount('#app');
-    </script>
-}

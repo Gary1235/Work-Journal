@@ -42,6 +42,16 @@ namespace Logic
             return dateTime;
         }
 
+        public static DateTime ToDateTime(this string? dtString)
+        {
+            if (DateTime.TryParse(dtString, out DateTime result))
+            {
+                return result;
+            }
+
+            return DateTime.Now;
+        }
+
         private static string[] AnalyzeString(string dtString)
         {
             Match match = Regex.Match(dtString, @"(\d+)\/(\d+)\/(\d+)");
