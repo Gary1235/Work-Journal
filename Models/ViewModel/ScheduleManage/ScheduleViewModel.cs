@@ -47,6 +47,13 @@ namespace Models.ViewModel.ScheduleManage
         public List<WorkScheduleViewModel> WorkSchedules { get; set; }
     }
 
+    public class ScheduleSearchViewModel : SearchModel
+    {
+        public int Year { get; set; }
+
+        public int Month { get; set; }
+    }
+
     public class ScheduleViewModel
     {
         public Guid Id { get; set; }

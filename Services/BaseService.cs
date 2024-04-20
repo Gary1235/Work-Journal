@@ -18,7 +18,7 @@ namespace Services
             db = dbContext;
         }
 
-        public SaveChangesResult DbSaveChanges()
+        public SaveChangesResult Save()
         {
             var result = new SaveChangesResult(false, "更新失敗");
 

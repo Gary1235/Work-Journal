@@ -33,6 +33,12 @@
         color: white;
     }
 
+    .filterBtn {
+        border-color: rebeccapurple;
+        background-color: rebeccapurple;
+        color: white;
+    }
+
 </style>
 <div id="app" class="container">
     <h1>工作日誌</h1>
@@ -42,9 +48,33 @@
             <input type="text" v-model="keyword" class="border-0" placeholder="輸入關鍵字搜尋...">
             <i class="fa-solid fa-magnifying-glass" v-on:click="Search();"></i>
         </div>
-        <!--新增鈕-->
+        <!-- 年份快篩 -->
+        <div class="btn-group ms-3">
+            <button type="button" class="btn btn-danger dropdown-toggle filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                年份: {{FilterYearDisplay}}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="javascript:;" v-on:click="FliterYear(0);">全部</a></li>
+                <template v-for="year in allYears">
+                    <li><a class="dropdown-item" href="javascript:;" v-on:click="FliterYear(year);">{{year}}</a></li>
+                </template>
+            </ul>
+        </div>
+        <!-- 月份快篩 -->
+        <div class="btn-group ms-3">
+            <button type="button" class="btn btn-danger dropdown-toggle filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                月份: {{FilterMonthDisplay}}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="javascript:;" v-on:click="FliterMonth(0);">全部</a></li>
+                <template v-for="month in allMonths">
+                    <li><a class="dropdown-item" href="javascript:;" v-on:click="FliterMonth(month);">{{month}}月</a></li>
+                </template>
+            </ul>
+        </div>
+        <!-- 新增鈕 -->
         <button type="button" v-on:click="Add();" class="btn btn-primary ms-3">新增</button>
-        <!--匯出每周行程-->
+        <!-- 匯出每周行程 -->
         <button type="button" v-on:click="ExportPeriod();" class="btn btn-secondary ms-3">匯出每周行程</button>
     </div>
     <div>
@@ -76,6 +106,7 @@
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id);">編輯</a></li>
                                 <li><a class="dropdown-item" href="javascript:;" v-on:click="ExportThatday(item.WorkDateTimeString);">匯出今日行程</a></li>
+                                <li><a class="dropdown-item" href="javascript:;" v-on:click="Delete(item.Id);">刪除</a></li>
                             </ul>
                         </div>
                     </td>
@@ -151,14 +182,36 @@
                 return {
                     model: {},
                     keyword: '',
+                    allMonths: [],
+                    allYears: [],
+                    currentMonth: 0,
+                    currentYear: 0,
                 }
             },
             created: function () {
                 this.Init();
             },
+            computed: {
+                FilterYearDisplay() {
+                    if (this.currentYear <= 0) {
+                        return '全部';
+                    }
+
+                    return this.currentYear + '年';
+                },
+                FilterMonthDisplay() {
+                    if (this.currentMonth <= 0) {
+                        return '全部';
+                    }
+
+                    return this.currentMonth + '月';
+                },
+            },
             methods: {
                 Init() {
                     this.GetList();
+                    this.GetFullMonth();
+                    this.GetYearFilter();
                 },
                 InitArrow() {
                     if (this.model.HasPreviousPage) {
@@ -181,6 +234,8 @@
                         Currentpage: this.model.CurrentPage,
                         PageSize: this.model.PageSize,
                         Keyword: this.keyword,
+                        Year: this.currentYear,
+                        Month: this.currentMonth,
                         __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
                     };
 
@@ -204,11 +259,43 @@
                     this.model.CurrentPage = 1;
                     this.GetList();
                 },
+                FliterYear(year) {
+                    this.model.CurrentPage = 1;
+                    this.currentYear = year;
+                    this.GetList();
+                },
+                FliterMonth(month) {
+                    this.model.CurrentPage = 1;
+                    this.currentMonth = month;
+                    this.GetList();
+                },
                 Edit(id) {
                     location.href = `@Url.Action(nameof(WorkScheduleController.Input))?scheduleId=${id}&ActionType=@ActionType.Edit`;
                 },
                 Add() {
                     location.href = `@Url.Action(nameof(WorkScheduleController.Input))?ActionType=@ActionType.Insert`;
+                },
+                Delete(id) {
+                    var result = confirm('確定要刪除?');
+                    if (result) {
+                        ShowBlock();
+                        var model = {
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                            id: id,
+                        };
+
+                        $.ajax({
+                            url: '@Url.Action(nameof(WorkScheduleController.Delete))',
+                            type: 'POST',
+                            data: model,
+                            success: function (response) {
+                                alert(response.Message);
+                                location.reload();
+                                CloseBlock();
+                            }
+                        })
+                    }
+                    
                 },
                 ExportThatday(date) {
                     exportApp.model = [];
@@ -229,6 +316,27 @@
                     var day = String(today.getDate()).padStart(2, '0');
 
                     return `${year}-${month}-${day}`;
+                },
+                GetFullMonth() {
+                    var list = [];
+                    for (var i = 1; i <= 12; i++) {
+                        list.push(i);
+                    }
+                    this.allMonths = list;
+                },
+                GetYearFilter() {
+                    var model = {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                    };
+
+                    $.ajax({
+                        url: '@Url.Action(nameof(WorkScheduleController.GetYearOfHasWork))',
+                        type: 'POST',
+                        data: model,
+                        success: function (response) {
+                            app.allYears = response;
+                        },
+                    });
                 },
             },
         }).mount('#app');

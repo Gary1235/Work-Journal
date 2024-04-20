@@ -25,7 +25,7 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SwitchPage(SearchModel search)
+        public IActionResult SwitchPage(ScheduleSearchViewModel search)
         {
             var list = _workScheduleService.GetList(search);
 
@@ -66,6 +66,14 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public IActionResult Delete(Guid id)
+        {
+            var result = _workScheduleService.DeleteWorkSchedule(id);
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ExportScheduleDaily(Guid scheduleId, bool needYesterday)
         {
             var exportData = _workScheduleService.ExportScheduleDaily(scheduleId, needYesterday);
@@ -80,6 +88,14 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
             var exportData = _workScheduleService.ExportSchedulePeriod(dtSString.ToDateTime(), dtEString.ToDateTime());
 
             return Json(exportData);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GetYearOfHasWork()
+        {
+            var list = _workScheduleService.GetYearOfHasWork();
+            return Json(list);
         }
     }
 }

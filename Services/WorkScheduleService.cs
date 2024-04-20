@@ -15,7 +15,7 @@ namespace Services
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
-        WorkSchedulePageList GetList(SearchModel search);
+        WorkSchedulePageList GetList(ScheduleSearchViewModel search);
         /// <summary>
         /// 取得 資料
         /// </summary>
@@ -29,6 +29,11 @@ namespace Services
         /// <returns></returns>
         WorkScheduleViewModel GetWorkSchedule(DateTime workDateTime);
         /// <summary>
+        /// 取得 有日誌的年份
+        /// </summary>
+        /// <returns></returns>
+        List<int> GetYearOfHasWork();
+        /// <summary>
         /// 新增 工作行程
         /// </summary>
         /// <param name="viewModel"></param>
@@ -40,6 +45,12 @@ namespace Services
         /// <param name="viewModel"></param>
         /// <returns></returns>
         SaveChangesResult UpdateWorkSchedule(WorkScheduleViewModel viewModel);
+        /// <summary>
+        /// 刪除 工作行程
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        SaveChangesResult DeleteWorkSchedule(Guid id);
         /// <summary>
         /// 匯出 行程(當日)
         /// </summary>
@@ -64,7 +75,7 @@ namespace Services
 
         }
 
-        public WorkSchedulePageList GetList(SearchModel search)
+        public WorkSchedulePageList GetList(ScheduleSearchViewModel search)
         {
             var model = new WorkSchedulePageList();
             IPagedList<Schedule> pageList;
@@ -74,6 +85,14 @@ namespace Services
             if (!string.IsNullOrEmpty(search.Keyword))
             {
                 query = query.Where(x => x.Subject.Contains(search.Keyword));
+            }
+            if (search.Year > 0)
+            {
+                query = query.Where(x => x.WorkDateTime.Year == search.Year);
+            }
+            if (search.Month > 0)
+            {
+                query = query.Where(x => x.WorkDateTime.Month == search.Month);
             }
 
             pageList = query
@@ -121,7 +140,7 @@ namespace Services
                 db.ScheduleItems.Add(detail);
             }
 
-            var result = DbSaveChanges();
+            var result = Save();
             return result;
         }
 
@@ -155,7 +174,7 @@ namespace Services
                 db.ScheduleItems.Add(detail);
             }
 
-            var result = DbSaveChanges();
+            var result = Save();
             return result;
         }
 
@@ -325,6 +344,21 @@ namespace Services
             }
 
             return exportData;
+        }
+
+        public List<int> GetYearOfHasWork()
+        {
+            var list = db.Schedules.Where(x => !x.IsDelete).Select(x => x.WorkDateTime.Year).Distinct().ToList();
+
+            return list;
+        }
+
+        public SaveChangesResult DeleteWorkSchedule(Guid id)
+        {
+            var data = db.Schedules.Where(x => x.Id == id);
+            db.Schedules.RemoveRange(data);
+
+            return Save();
         }
     }
 }
