@@ -53,7 +53,7 @@ namespace Services
         /// <param name="dateTimeStart"></param>
         /// <param name="dateTimeEnd"></param>
         /// <returns></returns>
-        ExportWorkSchedule ExportSchedulePeriod(DateTime dateTimeStart, DateTime dateTimeEnd);
+        ExportWorkSchedule ExportSchedulePeriod(DateTime? dateTimeStart, DateTime? dateTimeEnd);
     }
 
 
@@ -234,7 +234,7 @@ namespace Services
                 .ToList();
             }
 
-            data.Schedule = schedule ?? new ScheduleViewModel();
+            data.Schedule = schedule;
             data.ScheduleItems = scheduleItems;
 
             return data;
@@ -306,17 +306,21 @@ namespace Services
             return exportData;
         }
 
-        public ExportWorkSchedule ExportSchedulePeriod(DateTime dateTimeStart, DateTime dateTimeEnd)
+        public ExportWorkSchedule ExportSchedulePeriod(DateTime? dateTimeStart, DateTime? dateTimeEnd)
         {
             var exportData = new ExportWorkSchedule();
 
-            var currentDateTime = dateTimeStart;
-            while (DateTime.Compare(currentDateTime, dateTimeEnd) <= 0)
+            if (dateTimeStart != null && dateTimeEnd != null)
             {
-                var currentSchedule = GetWorkSchedule(currentDateTime);
-                if (currentSchedule != null && currentSchedule.Schedule != null)
+                var currentDateTime = dateTimeStart.Value;
+                while (DateTime.Compare(currentDateTime, dateTimeEnd.Value) <= 0)
                 {
-                    exportData.WorkSchedules.Add(currentSchedule);
+                    var currentSchedule = GetWorkSchedule(currentDateTime);
+                    if (currentSchedule != null && currentSchedule.Schedule != null)
+                    {
+                        exportData.WorkSchedules.Add(currentSchedule);
+                    }
+                    currentDateTime = currentDateTime.AddDays(1);
                 }
             }
 

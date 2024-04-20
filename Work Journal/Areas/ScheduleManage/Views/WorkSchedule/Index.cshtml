@@ -27,6 +27,12 @@
         background-color: transparent;
     }
 
+    .exportBtn {
+        border-color: mediumpurple;
+        background-color: mediumpurple;
+        color: white;
+    }
+
 </style>
 <div id="app" class="container">
     <h1>工作日誌</h1>
@@ -39,7 +45,7 @@
         <!--新增鈕-->
         <button type="button" v-on:click="Add();" class="btn btn-primary ms-3">新增</button>
         <!--匯出每周行程-->
-        @* <button type="button" v-on:click="ExportModal();" class="btn btn-secondary ms-3">匯出每周行程</button> *@
+        <button type="button" v-on:click="ExportPeriod();" class="btn btn-secondary ms-3">匯出每周行程</button>
     </div>
     <div>
         <span>第{{model.CurrentPage}}頁，共{{model.PageCount}}頁 | </span>
@@ -69,7 +75,7 @@
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li><a class="dropdown-item" href="javascript:;" v-on:click="Edit(item.Id);">編輯</a></li>
-                                @* <li><a class="dropdown-item" href="javascript:;" v-on:click="">匯出今日行程</a></li> *@
+                                <li><a class="dropdown-item" href="javascript:;" v-on:click="ExportThatday(item.WorkDateTimeString);">匯出今日行程</a></li>
                             </ul>
                         </div>
                     </td>
@@ -84,27 +90,21 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <h1 class="modal-title fs-5" id="exampleModalLabel">匯出工作日誌</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div>
-                    <input type="text" v-model="startDate" placeholder="輸入開始日期" />
-                    <input type="text" v-model="endDate" placeholder="輸入結束日期" />
-                    <!--輸出版型選擇-->
-                    <select v-model="exportTemplate">
-                        <option value="0">請選擇</option>
-                        <option value="1">表格</option>
-                        <option value="2">文字</option>
-                    </select>
-                    <button type="button">輸出</button>
+                <div class="mb-3">
+                    <input type="date" v-model="startDate" placeholder="輸入開始日期" />
+                    <input type="date" v-model="endDate" placeholder="輸入結束日期" />
+                    <button v-on:click="Export();" type="button" class="btn btn-info ms-3 exportBtn">輸出</button>
                 </div>
                 <!--版型預覽-->
                 <div>
                 </div>
                 <!--輸出Area-->
                 <div>
-                    <table style="border: solid;">
+                    <table>
                         <thead>
                             <tr>
                                 <th colspan="3">工作行程</th>
@@ -116,14 +116,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="sc in model">
+                            <template v-for="ws in model.WorkSchedules">
                                 <tr>
-                                    <td>{{DateFormat(sc.Schedule.WorkDateTimeString)}}</td>
-                                    <td v-for="item in sc.ScheduleItems">
-                                        <p>{{item.WorkItem}}</p>
+                                    <td>{{DateFormat(ws.Schedule.WorkDateTimeString)}}</td>
+                                    <td>
+                                        <template v-for="item in ws.ScheduleItems">
+                                            <p>{{item.WorkItem}}</p>
+                                        </template>
                                     </td>
-                                    <td v-for="item in sc.ScheduleItems">
-                                        <p>{{item.WorkDuration}}</p>
+                                    <td>
+                                        <template v-for="item in ws.ScheduleItems">
+                                            <p>{{item.WorkDuration}}</p>
+                                        </template>
                                     </td>
                                 </tr>
                             </template>
@@ -132,8 +136,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
             </div>
         </div>
     </div>
@@ -207,8 +210,25 @@
                 Add() {
                     location.href = `@Url.Action(nameof(WorkScheduleController.Input))?ActionType=@ActionType.Insert`;
                 },
-                ExportModal() {
+                ExportThatday(date) {
+                    exportApp.model = [];
                     $('#export_schedule').modal('show');
+                    exportApp.startDate = date;
+                    exportApp.endDate = date;
+                },
+                ExportPeriod() {
+                    exportApp.model = [];
+                    $('#export_schedule').modal('show');
+                    exportApp.startDate = this.GetDateNow();
+                    exportApp.endDate = this.GetDateNow();
+                },
+                GetDateNow() {
+                    var today = new Date();
+                    var year = today.getFullYear();
+                    var month = String(today.getMonth() + 1).padStart(2, '0');
+                    var day = String(today.getDate()).padStart(2, '0');
+
+                    return `${year}-${month}-${day}`;
                 },
             },
         }).mount('#app');

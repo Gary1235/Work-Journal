@@ -77,9 +77,7 @@ namespace Work_Journal.Areas.ScheduleManage.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ExportSchedulePeriod(string dtSString, string dtEString)
         {
-            var dtStart = dtSString.RocShortToDateTime();
-            var dtEnd = dtEString.RocShortToDateTime();
-            var exportData = _workScheduleService.ExportSchedulePeriod(dtStart, dtEnd);
+            var exportData = _workScheduleService.ExportSchedulePeriod(dtSString.ToDateTime(), dtEString.ToDateTime());
 
             return Json(exportData);
         }

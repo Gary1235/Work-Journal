@@ -42,14 +42,14 @@ namespace Logic
             return dateTime;
         }
 
-        public static DateTime ToDateTime(this string? dtString)
+        public static DateTime? ToDateTime(this string? dtString)
         {
             if (DateTime.TryParse(dtString, out DateTime result))
             {
                 return result;
             }
 
-            return DateTime.Now;
+            return null;
         }
 
         private static string[] AnalyzeString(string dtString)
